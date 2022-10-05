@@ -20,8 +20,6 @@ jobs:
     needs: [environment]
     name: Validate Environment Secrets
     uses: ./.github/workflows/validate-secrets.yaml
-    environment: 
-      name: ${{ needs.environment.outputs.name }}
     with:
       environment: ${{ needs.environment.outputs.name }}
     secrets: inherit
