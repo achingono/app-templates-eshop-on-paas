@@ -22,7 +22,12 @@ jobs:
     uses: ./.github/workflows/validate-secrets.yaml
     with:
       environment: ${{ needs.environment.outputs.name }}
-    secrets: inherit
+    secrets:
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+      AZURE_SUFFIX: ${{ secrets.AZURE_SUFFIX }}
+      AZURE_UNIQUE_CODE: ${{ secrets.AZURE_UNIQUE_CODE }}
+      AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
+      
   
   group:
     needs: [environment, validate]
