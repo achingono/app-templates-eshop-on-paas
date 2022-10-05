@@ -4,9 +4,6 @@ name: Deploy Solution
 
 on:
   workflow_dispatch:
-  
-env:
-  REPOSITORY: reddog
 
 jobs:
 
@@ -102,8 +99,8 @@ jobs:
     uses: ./.github/workflows/build-service.yaml
     with:
       environment: ${{ needs.environment.outputs.name }}
-      project: AccountingService
-      repository: env.REPOSITORY
+      project: RedDog.AccountingService
+      repository: reddog
       image: accounting-service
     secrets: 
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
