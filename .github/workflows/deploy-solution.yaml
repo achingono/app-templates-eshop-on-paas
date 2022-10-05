@@ -28,20 +28,6 @@ jobs:
       AZURE_UNIQUE_CODE: ${{ secrets.AZURE_UNIQUE_CODE }}
       AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
 
-  build-accounting:
-    needs: [environment,validate]
-    name: Build Accounting Service
-    uses: ./.github/workflows/build-service.yaml
-    with:
-      environment: ${{ needs.environment.outputs.name }}
-      project: AccountingService
-      repository: reddog
-      image: accounting-service
-    secrets: 
-      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
-      AZURE_SUFFIX: ${{ secrets.AZURE_SUFFIX }}
-      AZURE_UNIQUE_CODE: ${{ secrets.AZURE_UNIQUE_CODE }}
-
   group:
     needs: [environment, validate]
     name: Provision Resource Group 
@@ -72,7 +58,7 @@ jobs:
       name: ${{ steps.resource.outputs.name }}
     environment: 
       name: ${{ needs.environment.outputs.name }}
-
+    if: false
     steps:
       - uses: azure/login@v1
         with:
@@ -111,7 +97,21 @@ jobs:
         env:
           RESOURCE_GROUP: ${{ needs.environment.outputs.name }}-${{ secrets.AZURE_PROJECT_NAME }}-${{ secrets.AZURE_UNIQUE_CODE }}
           REGISTRY_NAME: acr${{ secrets.AZURE_PROJECT_NAME }}${{ secrets.AZURE_UNIQUE_CODE }}
-  
+
+  build-accounting:
+    needs: [environment,registry]
+    name: Build Accounting Service
+    uses: ./.github/workflows/build-service.yaml
+    with:
+      environment: ${{ needs.environment.outputs.name }}
+      project: AccountingService
+      repository: reddog
+      image: accounting-service
+    secrets: 
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+      AZURE_SUFFIX: ${{ secrets.AZURE_SUFFIX }}
+      AZURE_UNIQUE_CODE: ${{ secrets.AZURE_UNIQUE_CODE }}  
+
   build:
     needs: [environment, registry]
     name: Build Images 
@@ -120,7 +120,7 @@ jobs:
       name: ${{ needs.environment.outputs.name }}
     env:
       REGISTRY_NAME: acr${{ secrets.AZURE_PROJECT_NAME }}${{ secrets.AZURE_UNIQUE_CODE }}
-
+    if: false
     steps:
       - uses: actions/checkout@v2   
       - uses: azure/login@v1
@@ -232,7 +232,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: 
       name: ${{ needs.environment.outputs.name }}
-
+    if: false
     steps:
       - uses: actions/checkout@v2   
       - uses: azure/login@v1
