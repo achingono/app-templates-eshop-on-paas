@@ -254,7 +254,7 @@ jobs:
       AZURE_UNIQUE_CODE: ${{ secrets.AZURE_UNIQUE_CODE }}  
   
   deploy:
-    needs: [environment, registry, apim, build]
+    needs: [environment, registry, apim, build-accounting,build-bootstrapper,build-corporate-transfer,build-loyalty-service,build-makeline-service,build-order-service,build-receipt-service,build-ui,build-virtual-customer,build-virtual-worker]
     name: Deploy Bicep 
     runs-on: ubuntu-latest
     environment: 
