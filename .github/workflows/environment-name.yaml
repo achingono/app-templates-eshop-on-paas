@@ -1,7 +1,8 @@
 on:
   workflow_call:
     outputs:
-      name: ${{ jobs.environment.outputs.name }}
+      name: 
+        value: ${{ jobs.environment.outputs.name }}
 
 jobs:
 
