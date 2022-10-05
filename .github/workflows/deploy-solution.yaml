@@ -20,15 +20,12 @@ jobs:
     needs: [environment]
     name: Validate Environment Secrets
     uses: ./.github/workflows/validate-secrets.yaml
+    environment: 
+      name: ${{ needs.environment.outputs.name }}
     with:
       environment: ${{ needs.environment.outputs.name }}
-    secrets:
-      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
-      AZURE_SUFFIX: ${{ secrets.AZURE_SUFFIX }}
-      AZURE_UNIQUE_CODE: ${{ secrets.AZURE_UNIQUE_CODE }}
-      AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
-      
-  
+    secrets: inherit
+
   group:
     needs: [environment, validate]
     name: Provision Resource Group 
