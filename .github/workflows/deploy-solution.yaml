@@ -29,7 +29,7 @@ jobs:
       AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
 
   build-accounting:
-    needs: [environment]
+    needs: [environment,validate]
     name: Build Accounting Service
     uses: ./.github/workflows/build-service.yaml
     with:
@@ -41,7 +41,6 @@ jobs:
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
       AZURE_SUFFIX: ${{ secrets.AZURE_SUFFIX }}
       AZURE_UNIQUE_CODE: ${{ secrets.AZURE_UNIQUE_CODE }}
-      AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
 
   group:
     needs: [environment, validate]
