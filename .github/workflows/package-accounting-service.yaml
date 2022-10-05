@@ -30,7 +30,7 @@ jobs:
       AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
 
   build:
-    needs: [validate]
+    needs: [environment,validate]
     name: Build Service
     uses: ./.github/workflows/build-service.yaml
     with:
