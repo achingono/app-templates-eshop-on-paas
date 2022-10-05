@@ -14,44 +14,15 @@ jobs:
 
   environment:
     name: Determine Environment Name
-    runs-on: ubuntu-latest
-    outputs:
-      name: ${{ steps.environment.outputs.name }}
-
-    steps:
-      - name: Set Environment Name
-        id: environment
-        run: |
-          echo "Running on branch ${{ github.ref }}"
-          if [ "${{ github.ref }}" = "refs/heads/main" ] || [ "${{ github.ref }}" = "refs/heads/master" ]; then
-            echo "::set-output name=name::Production"
-          elif [ "${{ github.ref }}" = "refs/heads/dev" ] || [ "${{ github.ref }}" = "refs/heads/develop" ]; then
-            echo "::set-output name=name::Test"
-          else
-             echo "::set-output name=name::Features"
-          fi         
+    uses: ./.github/workflows/environment-name.yaml     
 
   validate:
     needs: [environment]
     name: Validate Environment Secrets
-    runs-on: ubuntu-latest
-    environment: 
-      name: ${{ needs.environment.outputs.name }}
-
-    steps:          
-      - run: |
-          if [ "${{ secrets.AZURE_PROJECT_NAME }}" == "" ]; then
-            echo "Please set environment secret 'AZURE_PROJECT_NAME' before running this workflow"
-            exit 1
-          fi
-          if [ "${{ secrets.AZURE_UNIQUE_CODE }}" == "" ]; then
-            echo "Please set environment secret 'AZURE_UNIQUE_CODE' before running this workflow"
-            exit 1
-          fi
-          if [ "${{ secrets.AZURE_LOCATION }}" == "" ]; then
-            echo "Please set environment secret 'AZURE_LOCATION' before running this workflow"
-            exit 1
-          fi
+    uses: ./.github/workflows/validate-secrets.yaml
+    with:
+      environment: ${{ needs.environment.outputs.name }}
+    secrets: inherit
   
   group:
     needs: [environment, validate]
