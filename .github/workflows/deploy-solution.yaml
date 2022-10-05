@@ -5,10 +5,8 @@ name: Deploy Solution
 on:
   workflow_dispatch:
   
-# https://github.com/Azure/login#sample-workflow-that-uses-azure-login-action-using-oidc-to-run-az-cli-linux
-permissions:
-  id-token: write
-  contents: read
+env:
+  REPOSITORY: reddog
 
 jobs:
 
@@ -48,7 +46,7 @@ jobs:
                           --location ${{ secrets.AZURE_LOCATION }} \
                           --query name
         env:
-          RESOURCE_GROUP: ${{ needs.environment.outputs.name }}-${{ secrets.AZURE_PROJECT_NAME }}-${{ secrets.AZURE_UNIQUE_CODE }}
+          RESOURCE_GROUP: ${{ needs.environment.outputs.name }}-${{ secrets.AZURE_SUFFIX }}-${{ secrets.AZURE_UNIQUE_CODE }}
   
   apim:
     needs: [environment, group]
@@ -66,7 +64,7 @@ jobs:
       - name: Create Resource
         id: resource
         run: |
-          az apim create --name apim-${{ secrets.AZURE_PROJECT_NAME }}-${{ secrets.AZURE_UNIQUE_CODE }} \
+          az apim create --name apim-${{ secrets.AZURE_SUFFIX }}-${{ secrets.AZURE_UNIQUE_CODE }} \
                                   --resource-group $RESOURCE_GROUP \
                                   --location ${{ secrets.AZURE_LOCATION }} \
                                   --publisher-email apim@contoso.com \
@@ -74,7 +72,7 @@ jobs:
                                   --sku-name Developer \
                                   --sku-capacity 1
         env:
-          RESOURCE_GROUP: ${{ needs.environment.outputs.name }}-${{ secrets.AZURE_PROJECT_NAME }}-${{ secrets.AZURE_UNIQUE_CODE }}
+          RESOURCE_GROUP: ${{ needs.environment.outputs.name }}-${{ secrets.AZURE_SUFFIX }}-${{ secrets.AZURE_UNIQUE_CODE }}
   
   registry:
     needs: [environment, group]
@@ -95,8 +93,8 @@ jobs:
                         --sku Basic \
                         --admin-enabled true
         env:
-          RESOURCE_GROUP: ${{ needs.environment.outputs.name }}-${{ secrets.AZURE_PROJECT_NAME }}-${{ secrets.AZURE_UNIQUE_CODE }}
-          REGISTRY_NAME: acr${{ secrets.AZURE_PROJECT_NAME }}${{ secrets.AZURE_UNIQUE_CODE }}
+          RESOURCE_GROUP: ${{ needs.environment.outputs.name }}-${{ secrets.AZURE_SUFFIX }}-${{ secrets.AZURE_UNIQUE_CODE }}
+          REGISTRY_NAME: acr${{ secrets.AZURE_SUFFIX }}${{ secrets.AZURE_UNIQUE_CODE }}
 
   build-accounting:
     needs: [environment,registry]
@@ -105,7 +103,7 @@ jobs:
     with:
       environment: ${{ needs.environment.outputs.name }}
       project: AccountingService
-      repository: reddog
+      repository: env.REPOSITORY
       image: accounting-service
     secrets: 
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
@@ -119,7 +117,7 @@ jobs:
     environment: 
       name: ${{ needs.environment.outputs.name }}
     env:
-      REGISTRY_NAME: acr${{ secrets.AZURE_PROJECT_NAME }}${{ secrets.AZURE_UNIQUE_CODE }}
+      REGISTRY_NAME: acr${{ secrets.AZURE_SUFFIX }}${{ secrets.AZURE_UNIQUE_CODE }}
     if: false
     steps:
       - uses: actions/checkout@v2   
@@ -245,4 +243,4 @@ jobs:
                                   --template-file ./infra/main.bicep \
                                   --parameters name=${{ needs.environment.outputs.name }} \
                                   --parameters location=${{ secrets.AZURE_LOCATION }} \
-                                  --parameters uniqueSuffix=${{ secrets.AZURE_PROJECT_NAME }}-${{ secrets.AZURE_UNIQUE_CODE }}
+                                  --parameters uniqueSuffix=${{ secrets.AZURE_SUFFIX }}-${{ secrets.AZURE_UNIQUE_CODE }}
